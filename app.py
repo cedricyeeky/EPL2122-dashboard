@@ -11,13 +11,12 @@ team_selection = st.sidebar.selectbox('Team', ('Arsenal', 'Aston Villa', 'Brentf
                                                'Leeds', 'Leicester', 'Liverpool', 'Man City', 'Man United', 
                                                'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves')) 
 
-# st.sidebar.subheader('Donut chart parameter')
-# donut_theta = st.sidebar.selectbox('Select data', ('q2', 'q3'))
 
-st.sidebar.subheader('Line chart parameters')
-plot_data = st.sidebar.multiselect('Select data', ['Home Goals', 'Away Goals', 'Home Conceded Goals', 'Away Conceded Goals'], 
-                                   ['Home Goals', 'Away Goals', 'Home Conceded Goals', 'Away Conceded Goals'])
-plot_height = st.sidebar.slider('Specify plot height', 200, 500, 250)
+# not done
+st.sidebar.subheader('Choose multiple teams for Line Chart')
+team_selection_multiple = st.sidebar.multiselect('Teams', ('Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton',
+                                               'Leeds', 'Leicester', 'Liverpool', 'Man City', 'Man United', 
+                                               'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves'), (team_selection)) 
 
 st.sidebar.markdown('''
 ---
@@ -27,7 +26,7 @@ Created with ❤️ by Cedric Yee.
 df = pd.read_csv('2021-2022.csv')
 
 # Convert the 'Date' column to datetime
-df['Date'] = pd.to_datetime(df['Date'])
+df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
 
 table = pd.DataFrame(list(df.HomeTeam.unique()),columns = ['Team'])
 table[['Played','Win','Draw','Loss','GF','GA','GD','Points']] = 0
@@ -59,10 +58,16 @@ table['Rank'] = table['Points'].rank(ascending=False, method='min')
 table = table.sort_values(by='Points', ascending=False)
 table = table.reset_index()
  
-st.markdown('### EPL Table')
+st.markdown('### EPL Table Standings')
 st.dataframe(table, use_container_width=True)
 
+# if team_selection_multiple:
+#     teams = team_selection_multiple
+# else:
+#     teams = [team_selection]
+
 st.markdown(f"### {team_selection}'s 2021-2022 EPL Season")
+
 
 team_sel_home = df[df['HomeTeam']==team_selection]
 team_sel_away = df[df['AwayTeam']==team_selection]
@@ -77,8 +82,29 @@ team_sel_records['Points'] = team_sel_records.apply(lambda row: 3 if row['FTR'] 
 team_points_over_time = team_sel_records.groupby('Date')['Points'].sum().reset_index()
 team_points_over_time['Cumulative Points'] = team_points_over_time['Points'].cumsum()
 
+# Extract metrics for the selected team
+selected_team_data = table[table['Team'] == team_selection].iloc[0]  # Get the row corresponding to the selected team
+
+st.markdown('#### Metrics')
+
+col1, col2 = st.columns(2)
+col1.metric("Points", selected_team_data['Points'])
+col2.metric("Rank", selected_team_data['Rank'])
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Games Played", selected_team_data['Played'])
+col2.metric("Wins", selected_team_data['Win'])
+col3.metric("Draws", selected_team_data['Draw'])
+col4.metric("Losses", selected_team_data['Loss'])
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Goals Scored (GF)", selected_team_data['GF'])
+col2.metric("Goals Conceded (GA)", selected_team_data['GA'])
+col3.metric("Goals Difference (GD) ", selected_team_data['GD'])
+
+
 # Display line chart of points over time
-st.markdown('### Points Over Time')
+st.markdown('#### Points Over Time')
 st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
 
 st.dataframe(team_sel_records, use_container_width=True)
