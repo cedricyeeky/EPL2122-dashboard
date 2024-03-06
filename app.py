@@ -4,6 +4,8 @@ import plost
 
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
+st.sidebar.image('Premier_League_Logo.png')
+
 st.sidebar.header('English Premier League `2021 - 2022`')
 
 st.sidebar.subheader('Choose your favourite team')
@@ -112,6 +114,8 @@ with tab2:
     st.markdown('#### Points Over Time')
     st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
 
+    # Display all team games played (sorted by date)
+    st.markdown('#### All Games Played')
     st.dataframe(team_sel_records, use_container_width=True)
 
 
