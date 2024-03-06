@@ -23,11 +23,15 @@ st.sidebar.markdown('''
 Created with ❤️ by Cedric Yee.
 ''')
 
+# Splitting into diff tabs for easy page navigation
+tab1, tab2 = st.tabs(["EPL Data", f"{team_selection} Data"])
+
 df = pd.read_csv('2021-2022.csv')
 
 # Convert the 'Date' column to datetime
 df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
 
+# Data Manipulation for tab1
 table = pd.DataFrame(list(df.HomeTeam.unique()),columns = ['Team'])
 table[['Played','Win','Draw','Loss','GF','GA','GD','Points']] = 0
 table = table.set_index('Team')
@@ -57,18 +61,17 @@ table['Rank'] = table['Points'].rank(ascending=False, method='min')
 
 table = table.sort_values(by='Points', ascending=False)
 table = table.reset_index()
- 
-st.markdown('### EPL Table Standings')
-st.dataframe(table, use_container_width=True)
 
-# if team_selection_multiple:
-#     teams = team_selection_multiple
-# else:
-#     teams = [team_selection]
+with tab1:
+    st.markdown('### EPL Table Standings')
+    st.dataframe(table, use_container_width=True)
 
-st.markdown(f"### {team_selection}'s 2021-2022 EPL Season")
+    st.scatter_chart(table, x="Team", y="Points", use_container_width=True)
 
+    st.markdown('### EPL Games Played Breakdown')
+    st.bar_chart(table, x="Team", y=table[['Win','Draw','Loss']], use_container_width=True, height=500)
 
+# Data Manipulation for team_selection tab (tab2)
 team_sel_home = df[df['HomeTeam']==team_selection]
 team_sel_away = df[df['AwayTeam']==team_selection]
 team_sel_records = pd.concat([team_sel_home,team_sel_away], ignore_index=True)
@@ -85,29 +88,31 @@ team_points_over_time['Cumulative Points'] = team_points_over_time['Points'].cum
 # Extract metrics for the selected team
 selected_team_data = table[table['Team'] == team_selection].iloc[0]  # Get the row corresponding to the selected team
 
-st.markdown('#### Metrics')
+with tab2:
+    st.markdown(f"### {team_selection}'s 2021-2022 EPL Season")
+    st.markdown('#### Metrics')
 
-col1, col2 = st.columns(2)
-col1.metric("Points", selected_team_data['Points'])
-col2.metric("Rank", selected_team_data['Rank'])
+    col1, col2 = st.columns(2)
+    col1.metric("Points", selected_team_data['Points'])
+    col2.metric("Rank", selected_team_data['Rank'])
 
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Games Played", selected_team_data['Played'])
-col2.metric("Wins", selected_team_data['Win'])
-col3.metric("Draws", selected_team_data['Draw'])
-col4.metric("Losses", selected_team_data['Loss'])
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Games Played", selected_team_data['Played'])
+    col2.metric("Wins", selected_team_data['Win'])
+    col3.metric("Draws", selected_team_data['Draw'])
+    col4.metric("Losses", selected_team_data['Loss'])
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Goals Scored (GF)", selected_team_data['GF'])
-col2.metric("Goals Conceded (GA)", selected_team_data['GA'])
-col3.metric("Goals Difference (GD) ", selected_team_data['GD'])
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Goals Scored (GF)", selected_team_data['GF'])
+    col2.metric("Goals Conceded (GA)", selected_team_data['GA'])
+    col3.metric("Goals Difference (GD) ", selected_team_data['GD'])
 
 
-# Display line chart of points over time
-st.markdown('#### Points Over Time')
-st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
+    # Display line chart of points over time
+    st.markdown('#### Points Over Time')
+    st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
 
-st.dataframe(team_sel_records, use_container_width=True)
+    st.dataframe(team_sel_records, use_container_width=True)
 
 
 
