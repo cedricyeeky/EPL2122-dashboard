@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plost
+import matplotlib.pyplot as plt
 
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
@@ -16,9 +17,9 @@ team_selection = st.sidebar.selectbox('Team', ('Arsenal', 'Aston Villa', 'Brentf
 
 # not done
 st.sidebar.subheader('Choose multiple teams for Line Chart')
-team_selection_multiple = st.sidebar.multiselect('Teams', ('Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton',
+team_selection_multiple = st.sidebar.multiselect('Teams', ['Arsenal', 'Aston Villa', 'Brentford', 'Brighton', 'Burnley', 'Chelsea', 'Crystal Palace', 'Everton',
                                                'Leeds', 'Leicester', 'Liverpool', 'Man City', 'Man United', 
-                                               'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves'), (team_selection)) 
+                                               'Newcastle', 'Norwich', 'Southampton', 'Tottenham', 'Watford', 'West Ham', 'Wolves'], (team_selection)) 
 
 st.sidebar.markdown('''
 ---
@@ -68,10 +69,13 @@ with tab1:
     st.markdown('### EPL Table Standings')
     st.dataframe(table, use_container_width=True)
 
-    st.scatter_chart(table, x="Team", y="Points", use_container_width=True)
-
     st.markdown('### EPL Games Played Breakdown')
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Games", 38)
+    col2.metric("Home Games", 19)
+    col3.metric("Away Games", 19)
     st.bar_chart(table, x="Team", y=table[['Win','Draw','Loss']], use_container_width=True, height=500)
+    st.line_chart(table, x="Team", y=["GF", "GA", "GD" ], height=500)
 
 # Data Manipulation for team_selection tab (tab2)
 team_sel_home = df[df['HomeTeam']==team_selection]
@@ -90,19 +94,25 @@ team_points_over_time['Cumulative Points'] = team_points_over_time['Points'].cum
 # Extract metrics for the selected team
 selected_team_data = table[table['Team'] == team_selection].iloc[0]  # Get the row corresponding to the selected team
 
+# Get comeback data for each team
+home_comeback = team_sel_home[(team_sel_home['FTR']=='H') & (team_sel_home['HTR']=='A')]
+away_comeback = team_sel_away[(team_sel_away['FTR']=='A') & (team_sel_away['HTR']=='H')]
+comebacks = pd.concat([home_comeback,away_comeback], ignore_index=True)
+comebacks = comebacks.sort_values(by='Date')
+
 with tab2:
     st.markdown(f"### {team_selection}'s 2021-2022 EPL Season")
+    
     st.markdown('#### Metrics')
 
     col1, col2 = st.columns(2)
     col1.metric("Points", selected_team_data['Points'])
     col2.metric("Rank", selected_team_data['Rank'])
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Games Played", selected_team_data['Played'])
-    col2.metric("Wins", selected_team_data['Win'])
-    col3.metric("Draws", selected_team_data['Draw'])
-    col4.metric("Losses", selected_team_data['Loss'])
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Wins", selected_team_data['Win'])
+    col2.metric("Draws", selected_team_data['Draw'])
+    col3.metric("Losses", selected_team_data['Loss'])
 
     col1, col2, col3 = st.columns(3)
     col1.metric("Goals Scored (GF)", selected_team_data['GF'])
@@ -111,12 +121,16 @@ with tab2:
 
 
     # Display line chart of points over time
-    st.markdown('#### Points Over Time')
+    st.markdown('#### Points Over the Season')
     st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
 
     # Display all team games played (sorted by date)
     st.markdown('#### All Games Played')
     st.dataframe(team_sel_records, use_container_width=True)
+
+    # Display comebacks
+    st.markdown('#### Notable Comebacks')
+    st.dataframe(comebacks, use_container_width=True)
 
 
 
