@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import seaborn as sns
 import plost
 import matplotlib.pyplot as plt
 
@@ -74,8 +75,30 @@ with tab1:
     col1.metric("Total Games", 38)
     col2.metric("Home Games", 19)
     col3.metric("Away Games", 19)
+
     st.bar_chart(table, x="Team", y=table[['Win','Draw','Loss']], use_container_width=True, height=500)
+
     st.line_chart(table, x="Team", y=["GF", "GA", "GD" ], height=500)
+
+    # seaborn boxplot of the no. of home goals scored by each epl team
+    plot_fthg = sns.boxplot(y='HomeTeam', x='FTHG', data=df, color="darkorange")
+    plt.title('Home Goals Scored by each EPL Team in 2021-2022')
+    plt.xlabel('Full Time Home Goals')
+    plt.ylabel('EPL Team')
+    fig_fthg = plot_fthg.get_figure()
+    st.pyplot(fig_fthg)
+
+    # seaborn boxplot of the no. of away goals scored by each epl team
+    plt.figure()
+    plot_ftag = sns.boxplot(y='AwayTeam', x='FTAG', data=df, color="cyan")
+    plt.title('Away Goals Scored by each EPL Team in 2021-2022')
+    plt.xlabel('Full Time Away Goals')
+    plt.ylabel('EPL Team')
+    fig_ftag = plot_ftag.get_figure()
+    st.pyplot(fig_ftag)
+
+
+    
 
 # Data Manipulation for team_selection tab (tab2)
 team_sel_home = df[df['HomeTeam']==team_selection]
