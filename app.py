@@ -66,6 +66,19 @@ table['Rank'] = table['Points'].rank(ascending=False, method='min')
 table = table.sort_values(by='Points', ascending=False)
 table = table.reset_index()
 
+# second table to show total shots + on target shots
+table2 = pd.DataFrame(list(df.HomeTeam.unique()),columns = ['Team'])
+table2[['Total Shots', 'Total Shots on Target']] = 0
+table2 = table2.set_index('Team')
+for i in df.index:
+    home = df.HomeTeam.loc[i]
+    away = df.AwayTeam.loc[i]
+    table2.loc[home,'Total Shots'] += df.HS.loc[i]
+    table2.loc[home,'Total Shots on Target'] += df.HST.loc[i]
+    table2.loc[away,'Total Shots'] += df.AS.loc[i]
+    table2.loc[away,'Total Shots on Target'] += df.AST.loc[i]
+table2 = table2.reset_index()
+
 with tab1:
     st.markdown('### EPL Table Standings')
     st.dataframe(table, use_container_width=True)
@@ -97,8 +110,9 @@ with tab1:
     fig_ftag = plot_ftag.get_figure()
     st.pyplot(fig_ftag)
 
+    # bar chart of total shots and total accurate shots
+    st.line_chart(table2, x="Team", y=table2[['Total Shots', 'Total Shots on Target']], use_container_width=True, height=400)
 
-    
 
 # Data Manipulation for team_selection tab (tab2)
 team_sel_home = df[df['HomeTeam']==team_selection]
