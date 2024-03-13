@@ -138,58 +138,63 @@ comebacks = pd.concat([home_comeback,away_comeback], ignore_index=True)
 comebacks = comebacks.sort_values(by='Date')
 
 with tab2:
-    st.markdown(f"### {team_selection}'s 2021-2022 EPL Season")
-    
-    st.markdown('#### Metrics')
+    tab_1, tab_2, tab_3 = st.tabs(["Overall Season Outlook", "Home Games", "Away Games"])
 
-    col1, col2 = st.columns(2)
-    col1.metric("Points", selected_team_data['Points'])
-    col2.metric("Rank", selected_team_data['Rank'])
+    with tab_1: 
+        st.markdown(f"### {team_selection}'s 2021-2022 EPL Season")
+        
+        st.markdown('#### Metrics')
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Wins", selected_team_data['Win'])
-    col2.metric("Draws", selected_team_data['Draw'])
-    col3.metric("Losses", selected_team_data['Loss'])
+        col1, col2 = st.columns(2)
+        col1.metric("Points", selected_team_data['Points'])
+        col2.metric("Rank", selected_team_data['Rank'])
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Goals Scored (GF)", selected_team_data['GF'])
-    col2.metric("Goals Conceded (GA)", selected_team_data['GA'])
-    col3.metric("Goals Difference (GD) ", selected_team_data['GD'])
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Wins", selected_team_data['Win'])
+        col2.metric("Draws", selected_team_data['Draw'])
+        col3.metric("Losses", selected_team_data['Loss'])
 
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Goals Scored (GF)", selected_team_data['GF'])
+        col2.metric("Goals Conceded (GA)", selected_team_data['GA'])
+        col3.metric("Goals Difference (GD) ", selected_team_data['GD'])
 
-    # Display line chart of points over time
-    st.markdown('#### Points Over the Season')
-    st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
+        # Display line chart of points over time
+        st.markdown('#### Points Over the Season')
+        st.line_chart(team_points_over_time.set_index('Date')[['Cumulative Points']], height=500)
 
-    # Display comebacks
-    st.markdown('#### Notable Comebacks')
-    st.dataframe(comebacks, use_container_width=True)
+        # Display comebacks
+        st.markdown('#### Notable Comebacks')
+        st.dataframe(comebacks, use_container_width=True)
 
-    # Display FTHG, HTHG for Home games
-    st.markdown('#### Home Games Played')
-    st.line_chart(team_sel_home, x='Date', y=team_sel_home[['FTHG','HTHG']], use_container_width=True, height=400)
+        # Display all team games played (sorted by date)
+        st.markdown('#### All Games Played')
+        st.dataframe(team_sel_records, use_container_width=True)
 
-    # Display metrics for Home Games
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Home Games", 19)
-    col2.metric("Wins", len(team_sel_home[team_sel_home['FTR']=='H']))
-    col3.metric("Draws", len(team_sel_home[team_sel_home['FTR']=='D']))
-    col4.metric("Losses", len(team_sel_home[team_sel_home['FTR']=='A']))
-    
-    # Display FTAG, HTAG for Away Games
-    st.markdown('#### Away Games Played')
-    st.line_chart(team_sel_away, x='Date', y=team_sel_away[['FTAG','HTAG']], use_container_width=True, height=400)
+    with tab_2:
+        # Display FTHG, HTHG for Home games
+        st.markdown('#### Home Games Played')
+        st.line_chart(team_sel_home, x='Date', y=team_sel_home[['FTHG','HTHG']], use_container_width=True, height=400)
 
-    # Display metrics for Home Games
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Away Games", 19)
-    col2.metric("Wins", len(team_sel_away[team_sel_away['FTR']=='A']))
-    col3.metric("Draws", len(team_sel_away[team_sel_away['FTR']=='D']))
-    col4.metric("Losses", len(team_sel_away[team_sel_away['FTR']=='H']))
+        # Display metrics for Home Games
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Home Games", 19)
+        col2.metric("Wins", len(team_sel_home[team_sel_home['FTR']=='H']))
+        col3.metric("Draws", len(team_sel_home[team_sel_home['FTR']=='D']))
+        col4.metric("Losses", len(team_sel_home[team_sel_home['FTR']=='A']))
 
-    # Display all team games played (sorted by date)
-    st.markdown('#### All Games Played')
-    st.dataframe(team_sel_records, use_container_width=True)
+    with tab_3:
+        # Display FTAG, HTAG for Away Games
+        st.markdown('#### Away Games Played')
+        st.line_chart(team_sel_away, x='Date', y=team_sel_away[['FTAG','HTAG']], use_container_width=True, height=400)
+
+        # Display metrics for Home Games
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Away Games", 19)
+        col2.metric("Wins", len(team_sel_away[team_sel_away['FTR']=='A']))
+        col3.metric("Draws", len(team_sel_away[team_sel_away['FTR']=='D']))
+        col4.metric("Losses", len(team_sel_away[team_sel_away['FTR']=='H']))
+
 
 
 
