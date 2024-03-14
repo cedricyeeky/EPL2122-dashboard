@@ -172,10 +172,6 @@ with tab2:
         st.dataframe(team_sel_records, use_container_width=True)
 
     with tab_2:
-        # Display FTHG, HTHG for Home games
-        st.markdown('#### Home Games Played')
-        st.line_chart(team_sel_home, x='Date', y=team_sel_home[['FTHG','HTHG']], use_container_width=True, height=400)
-
         # Display metrics for Home Games
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Home Games", 19)
@@ -183,17 +179,38 @@ with tab2:
         col3.metric("Draws", len(team_sel_home[team_sel_home['FTR']=='D']))
         col4.metric("Losses", len(team_sel_home[team_sel_home['FTR']=='A']))
 
-    with tab_3:
-        # Display FTAG, HTAG for Away Games
-        st.markdown('#### Away Games Played')
-        st.line_chart(team_sel_away, x='Date', y=team_sel_away[['FTAG','HTAG']], use_container_width=True, height=400)
+        # Display FTHG, HTHG for Home games
+        st.markdown('#### Goals Scored (Half Time, Full Time)')
+        st.line_chart(team_sel_home, x='Date', y=team_sel_home[['FTHG','HTHG']], use_container_width=True, height=400)
 
+        # Display Corners Taken
+        st.markdown('#### Corners Taken')
+        st.line_chart(team_sel_home, x='Date', y='HC', use_container_width=True)
+
+        # Display Fouls, yellow cards, red cards
+        st.markdown('#### Fouls, Yellows, Reds')
+        st.line_chart(team_sel_home, x='Date', y=team_sel_home[['HF', 'HY', 'HR']], use_container_width=True)
+
+    with tab_3:
         # Display metrics for Home Games
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Away Games", 19)
         col2.metric("Wins", len(team_sel_away[team_sel_away['FTR']=='A']))
         col3.metric("Draws", len(team_sel_away[team_sel_away['FTR']=='D']))
         col4.metric("Losses", len(team_sel_away[team_sel_away['FTR']=='H']))
+
+        # Display FTAG, HTAG for Away Games
+        st.markdown('#### Goals Scored (Half Time, Full Time)')
+        st.line_chart(team_sel_away, x='Date', y=team_sel_away[['FTAG','HTAG']], use_container_width=True, height=400)
+
+        # Display Corners Taken
+        st.markdown('#### Corners Taken')
+        st.line_chart(team_sel_away, x='Date', y='AC', use_container_width=True)
+
+        # Display Fouls, yellow cards, red cards
+        st.markdown('#### Fouls, Yellows, Reds')
+        st.line_chart(team_sel_away, x='Date', y=team_sel_away[['AF', 'AY', 'AR']], use_container_width=True)
+
 
 
 
