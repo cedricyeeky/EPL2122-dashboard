@@ -79,6 +79,21 @@ for i in df.index:
     table2.loc[away,'Total Shots on Target'] += df.AST.loc[i]
 table2 = table2.reset_index()
 
+# third table to show total fouls, total yellow cards, total red cards by Team
+table3 = pd.DataFrame(list(df.HomeTeam.unique()),columns = ['Team'])
+table3[['Total Fouls', 'Total Yellow Cards', 'Total Red Cards']] = 0
+table3 = table3.set_index('Team')
+for i in df.index:
+    home = df.HomeTeam.loc[i]
+    away = df.AwayTeam.loc[i]
+    table3.loc[home,'Total Fouls'] += df.HF.loc[i]
+    table3.loc[home,'Total Yellow Cards'] += df.HY.loc[i]
+    table3.loc[home,'Total Red Cards'] += df.HR.loc[i]
+    table3.loc[away,'Total Fouls'] += df.AF.loc[i]
+    table3.loc[away,'Total Yellow Cards'] += df.AY.loc[i]
+    table3.loc[away,'Total Red Cards'] += df.AR.loc[i]
+table3 = table3.reset_index()
+
 with tab1:
     st.markdown('### EPL Table Standings')
     st.dataframe(table, use_container_width=True)
@@ -110,8 +125,11 @@ with tab1:
     fig_ftag = plot_ftag.get_figure()
     st.pyplot(fig_ftag)
 
-    # bar chart of total shots and total accurate shots
+    # line chart of total shots and total accurate shots
     st.line_chart(table2, x="Team", y=table2[['Total Shots', 'Total Shots on Target']], use_container_width=True, height=400)
+
+    # line chart of total fouls, total yellows, total reds by team
+    st.line_chart(table3, x='Team', y=table3[['Total Fouls', 'Total Yellow Cards', 'Total Red Cards']], use_container_width=True, height=400)
 
 
 # Data Manipulation for team_selection tab (tab2)
