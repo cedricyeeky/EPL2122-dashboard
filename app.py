@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 
-st.sidebar.image('Premier_League_Logo.png')
+st.sidebar.image('images/Premier_League_Logo.png')
 
 st.sidebar.header('English Premier League `2021 - 2022`')
 
